@@ -85,7 +85,7 @@ class MainActivity : AppCompatActivity() {
         // TODO: Move this to separate activity with randomization options
         val saveDir = this.saveDir
         if (saveDir == null) {
-            toast(error_not_loaded)
+            toast(noromloaded)
             return
         }
         doAsync {
@@ -113,17 +113,18 @@ class MainActivityUI: AnkoComponent<MainActivity> {
     override fun createView(ui: AnkoContext<MainActivity>) = ui.apply {
         verticalLayout {
             val romsDir = editText(defaultDir)
-            button(action_open_rom) {
+            button(openrombutton) {
                 onClick {
                     if (owner.loading) { return@onClick }
                     owner.listRoms(File(romsDir.text.toString()))?.apply {
-                        selector(ctx.getString(action_open_rom), map(File::nameWithoutExtension)) { _, index ->
+                        selector(ctx.getString(openrombutton),
+                                map(File::nameWithoutExtension)) { _, index ->
                             owner.loadRom(get(index).absolutePath)
                         }
                     }
                 }
             }
-            button(action_save_rom) {
+            button(saverombutton) {
                 onClick {
                     owner.saveRom()
                 }

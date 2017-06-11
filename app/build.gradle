@@ -1,6 +1,12 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 
+Properties importStrings = new Properties()
+importStrings.load(new FileInputStream(file(
+        "../universal-pokemon-randomizer/src/com/dabomstew/pkrandom/gui/Bundle.properties")))
+def trimPrefix = ~/^randomizergui_/
+def trimSuffix = ~/_?text$/
+
 android {
     compileSdkVersion 25
     buildToolsVersion "25.0.2"
@@ -11,10 +17,15 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+        importStrings.forEach { rawKey, value ->
+            def key = (rawKey.toLowerCase().replaceAll("\\.", "_") - trimPrefix) - trimSuffix
+            resValue "string", key, "\"$value\""
+        }
     }
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
@@ -26,7 +37,7 @@ dependencies {
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile 'com.android.support:appcompat-v7:25.3.0'
+    compile 'com.android.support:appcompat-v7:25.3.1'
     testCompile 'junit:junit:4.12'
     compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
     compile "org.jetbrains.anko:anko:0.10.1"
