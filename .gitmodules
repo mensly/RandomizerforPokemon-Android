@@ -1,0 +1,3 @@
+[submodule "universal-pokemon-randomizer"]
+	path = universal-pokemon-randomizer
+	url = git@github.com:mensly/universal-pokemon-randomizer.git
