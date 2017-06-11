@@ -62,6 +62,7 @@ class MainActivity : AppCompatActivity() {
     fun loadRom(romPath: String) {
         val handler = romHandlerFactories.firstOrNull { it.isLoadable(romPath) }
         if (handler == null) {
+
             longToast(error_invalid_rom, romPath)
             return
         }

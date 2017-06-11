@@ -2,11 +2,13 @@ package ly.mens.rndpkmn
 
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import com.dabomstew.pkrandom.Randomizer
+import com.dabomstew.pkrandom.Settings
+import com.dabomstew.pkrandom.romhandlers.Gen1RomHandler
 import com.dabomstew.pkrandom.romhandlers.RomHandler
-import org.jetbrains.anko.AnkoComponent
-import org.jetbrains.anko.AnkoContext
-import org.jetbrains.anko.setContentView
-import org.jetbrains.anko.verticalLayout
+import ly.mens.rndpkmn.R.string.saverombutton
+import org.jetbrains.anko.*
+import org.jetbrains.anko.sdk25.coroutines.onClick
 import java.io.File
 
 
@@ -16,7 +18,9 @@ class RandomizerActivity: AppCompatActivity() {
         const val HANDLER_FACTORY = "HANDLER_FACTORY"
     }
     lateinit private var saveDir: File
+    lateinit private var outputName: String
     lateinit private var romHandler: RomHandler
+    val operations = mutableListOf<Settings.()->Unit>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,15 +31,31 @@ class RandomizerActivity: AppCompatActivity() {
         romHandler = handlerFactory.create(random).apply {
             // TODO: Make async
             loadRom(romPath)
+            outputName = "$romName Random.$defaultExtension"
         }
         RandomizerActivityUI().setContentView(this)
     }
+
+    fun saveRom() {
+        Randomizer(settings, romHandler)
+                .randomize(File(saveDir, outputName).canonicalPath)
+    }
+
+    val settings = Settings()
+    val timeBasedEncounters get() = romHandler.hasTimeBasedEncounters()
+    val heldItems get() = romHandler !is Gen1RomHandler
 }
 
 class RandomizerActivityUI: AnkoComponent<RandomizerActivity> {
-    override fun createView(ui: AnkoContext<RandomizerActivity>) = ui.apply {
-        verticalLayout {
-
+    override fun createView(ui: AnkoContext<RandomizerActivity>) = ui.apply { owner.apply {
+        // TODO: Tabs?
+        scrollView {
+            verticalLayout {
+                wildPokemon(settings, timeBasedEncounters, heldItems)
+                button(saverombutton) { onClick {
+                    saveRom()
+                } }
+            }
         }
-    }.view
+    }}.view
 }
